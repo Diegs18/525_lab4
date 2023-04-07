@@ -100,7 +100,10 @@ module gcn (
             end
             adj : begin //create the adjaceny matrix
                 adj_en = 1'b1; 
-                next_state = feat_ag;
+                if (adj_done == 1'b1)
+                   next_state = feat_ag;
+                else 
+                    next_state <= adj; 
 
             end
             feat_ag : begin
@@ -201,7 +204,7 @@ module gcn (
 logic [5:0] feat_sel;
 logic [2:0] mat_cnt ;
 logic [2:0] next_mat_cnt ;
-logic [5:0][BW-1:0] element1, element2, element13, element14, element15, element16; 
+logic [num_of_nodes-1:0][BW-1:0] elements1, elements2, elements3, elements4, elements5, elements6; 
 logic en1, en2, en3, en4, en5, en6; 
 logic [BW-1:0] element21, element22, element23, element24, element25, element26;
 logic [7:0] ag_cnt, next_ag_cnt; 
@@ -210,19 +213,27 @@ always_ff @( posedge clk or negedge rst_n ) begin : feat_ag_reg
     if(~rst_n) begin
         feat_sel <= 6'd0;
         mat_cnt <= 3'b0;
-        element11 <= 6'd0;
-        element12 <= 6'd0;
-        element13 <= 6'd0;
-        element14 <= 6'd0;
-        element15 <= 6'd0;
-        element16 <= 6'd0;
+        //element11 <= 6'd0;
+        //element12 <= 6'd0;
+        //element13 <= 6'd0;
+        //element14 <= 6'd0;
+        //element15 <= 6'd0;
+        //element16 <= 6'd0;
 
-        element21 <= 6'd0;
+        for(i=8'd0; i<num_of_nodes; i++) begin
+            elements1[i] <= {BW-1{1'b0}}; 
+            elements2[i] <= {BW-1{1'b0}}; 
+            elements3[i] <= {BW-1{1'b0}}; 
+            elements4[i] <= {BW-1{1'b0}}; 
+            elements5[i] <= {BW-1{1'b0}}; 
+            elements6[i] <= {BW-1{1'b0}}; 
+        end
+        /*element21 <= 6'd0;
         element22 <= 6'd0;
         element23 <= 6'd0;
         element24 <= 6'd0;
         element25 <= 6'd0;
-        element26 <= 6'd0;
+        element26 <= 6'd0;*/
 
         ag_cnt <= 8'd0; 
     end
@@ -230,7 +241,7 @@ always_ff @( posedge clk or negedge rst_n ) begin : feat_ag_reg
         if(feat_ag_en) begin
             feat_sel <= adj_mat[mat_cnt];
             mat_cnt <= next_mat_cnt;
-            if(en1 == 1) begin
+            /*if(en1 == 1) begin
                 element11 <= col_features_r[0][0]; 
                 element21 <= col_features_r[1][0]; 
             end
@@ -253,7 +264,7 @@ always_ff @( posedge clk or negedge rst_n ) begin : feat_ag_reg
             if(en6 == 1) begin
                 element16 <= col_features_r[0][5]; 
                 element26 <= col_features_r[1][5];
-            end
+            end*/
         end
     end
     
