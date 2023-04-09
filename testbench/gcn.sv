@@ -201,82 +201,75 @@ module gcn (
 //////////////////////////////////////////////////////////////////////////////////////////////
 //                        Feature aggregation
 //////////////////////////////////////////////////////////////////////////////////////////////
-logic [5:0] feat_sel;
+logic [5:0] feat_sel1, feat_sel2, feat_sel3, feat_sel4, feat_sel5, feat_sel6;
 logic [2:0] mat_cnt ;
 logic [2:0] next_mat_cnt ;
-logic [num_of_nodes-1:0][BW-1:0] elements1, elements2, elements3, elements4, elements5, elements6; 
-logic en1, en2, en3, en4, en5, en6; 
-logic [BW-1:0] element21, element22, element23, element24, element25, element26;
+logic [num_of_nodes-1:0][BW-1:0] elements10, elements20;//, elements3, elements4, elements5, elements6; //the first and second clocked col vs adj_row
+logic en11, en12, en13, en14, en15, en16; 
+logic en21, en22, en23, en24, en25, en26;
+//logic [BW-1:0] element21, element22, element23, element24, element25, element26; /the first clocked col vs element in col
 logic [7:0] ag_cnt, next_ag_cnt; 
-
+logic [num_of_nodes-1:0][9:0] ag1, ag2; //1st/2nd col  vs first
 always_ff @( posedge clk or negedge rst_n ) begin : feat_ag_reg
     if(~rst_n) begin
-        feat_sel <= 6'd0;
-        mat_cnt <= 3'b0;
-        //element11 <= 6'd0;
-        //element12 <= 6'd0;
-        //element13 <= 6'd0;
-        //element14 <= 6'd0;
-        //element15 <= 6'd0;
-        //element16 <= 6'd0;
-
         for(i=8'd0; i<num_of_nodes; i++) begin
-            elements1[i] <= {BW-1{1'b0}}; 
-            elements2[i] <= {BW-1{1'b0}}; 
-            elements3[i] <= {BW-1{1'b0}}; 
-            elements4[i] <= {BW-1{1'b0}}; 
-            elements5[i] <= {BW-1{1'b0}}; 
-            elements6[i] <= {BW-1{1'b0}}; 
+            elements10[i] <= {BW-1{1'b0}}; 
+            elements20[i] <= {BW-1{1'b0}}; 
+            ag1[i] <= 10'd0; 
+            ag2[i] <= 10'd0; 
         end
-        /*element21 <= 6'd0;
-        element22 <= 6'd0;
-        element23 <= 6'd0;
-        element24 <= 6'd0;
-        element25 <= 6'd0;
-        element26 <= 6'd0;*/
-
         ag_cnt <= 8'd0; 
     end
     else begin
         if(feat_ag_en) begin
-            feat_sel <= adj_mat[mat_cnt];
-            mat_cnt <= next_mat_cnt;
-            /*if(en1 == 1) begin
-                element11 <= col_features_r[0][0]; 
-                element21 <= col_features_r[1][0]; 
+            if(feat_sel1[0] == 1) begin
+                elements10[0] <= col_features_r[0][0];
+                elements20[0] <= col_features_r[1][0];
             end
-            if(en2 == 1) begin
-                element12 <= col_features_r[0][1]; 
-                element22 <= col_features_r[1][1];
+            if(feat_sel1[1] == 1) begin
+                elements10[1] <= col_features_r[0][1];
+                elements20[1] <= col_features_r[1][1]; 
             end
-            if(en3 == 1) begin
-                element13 <= col_features_r[0][2]; 
-                element23 <= col_features_r[1][2];
+            if(feat_sel1[2] == 1) begin
+                elements10[2] <= col_features_r[0][2];
+                elements20[2] <= col_features_r[1][2]; 
             end
-            if(en4 == 1) begin
-                element14 <= col_features_r[0][3]; 
-                element24 <= col_features_r[1][3];
+            if(feat_sel1[3] == 1) begin
+                elements10[3] <= col_features_r[0][3]; 
+                elements20[0] <= col_features_r[1][0];
             end
-            if(en5 == 1) begin
-                element15 <= col_features_r[0][4]; 
-                element25 <= col_features_r[1][4];
+            if(feat_sel1[4] == 1) begin
+                elements10[4] <= col_features_r[0][4];
+                elements20[4] <= col_features_r[1][4]; 
             end
-            if(en6 == 1) begin
-                element16 <= col_features_r[0][5]; 
-                element26 <= col_features_r[1][5];
-            end*/
+            if(feat_sel1[5] == 1) begin
+                elements10[5] <= col_features_r[0][5];
+                elements20[5] <= col_features_r[1][5];
+            end
+            ag1[0] <= elements10[0] + elements10[1] + elements10[2] + elements10[3] + elements10[4] + elements10[5]; 
+            ag2[0] <= elements20[0] + elements20[1] + elements20[2] + elements20[3] + elements20[4] + elements20[5]; 
         end
-    end
-    
+    end  
 end
-assign en1 = feat_sel[0]; 
-assign en2 = feat_sel[1];
-assign en3 = feat_sel[2];
-assign en4 = feat_sel[3];
-assign en5 = feat_sel[4];
-assign en6 = feat_sel[5];
+assign feat_sel1 = adj_mat[0];
+/*assign en11 = feat_sel1[0]; //
+assign en12 = feat_sel1[1];
+assign en13 = feat_sel1[2];
+assign en14 = feat_sel1[3];
+assign en15 = feat_sel1[4];
+assign en16 = feat_sel1[5];*/
 
-assign next_mat_cnt = mat_cnt + 1'b0; 
+assign feat_sel2 = adj_mat[1];
+
+
+assign feat_sel3 = adj_mat[2];
+assign feat_sel4 = adj_mat[3];
+assign feat_sel5 = adj_mat[4];
+assign feat_sel6 = adj_mat[5];
+
+
+
+//assign next_mat_cnt = mat_cnt + 1'b0; 
 assign next_ag_cnt  = ag_cnt + 1'b1; //used to iterate to the next address in the  
 
 //assign feat_ag_done = (mat_cnt > num_of_rows_in_f_mem-1)? 1'b1 : 1'b0; 
