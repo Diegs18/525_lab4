@@ -10,23 +10,23 @@ cModel Technology
 dC:/Users/npdho/Desktop/Lab4/source
 vgcn
 Z0 DXx6 sv_std 3 std 0 22 AD7iAPLo6nTIKk<N0eo=D3
-DXx4 work 11 gcn_sv_unit 0 22 ;1^9c1;B__[_a95@JB;_41
+DXx4 work 11 gcn_sv_unit 0 22 Kb@0CFfMQ75@PNg?=Z?mg2
 Z1 VDg1SIo80bB@j0V0VzS_@n1
 r1
 !s85 0
 31
 !i10b 1
-!s100 gk5bEF0X_AM0n1F90N]J80
-I9;H[Z3oiXWAfo2b@J8AeN0
+!s100 ^m=GU0<g64K:PX865k2RI0
+IjNjMD6>T[VCQ;6CZ>]_Fc3
 !s105 gcn_sv_unit
 S1
 Z2 dC:/Users/npdho/Desktop/Lab4/testbench
-Z3 w1681087787
+Z3 w1681103644
 Z4 8C:/Users/npdho/Desktop/Lab4/testbench/gcn.sv
 Z5 FC:/Users/npdho/Desktop/Lab4/testbench/gcn.sv
 L0 3
 Z6 OV;L;10.5b;63
-Z7 !s108 1681087865.000000
+Z7 !s108 1681103647.000000
 Z8 !s107 params.vh|C:/Users/npdho/Desktop/Lab4/testbench/gcn.sv|
 Z9 !s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/Users/npdho/Desktop/Lab4/testbench/gcn.sv|
 !i113 1
@@ -34,13 +34,13 @@ Z10 o-work work -sv
 Z11 tCvgOpt 0
 Xgcn_sv_unit
 R0
-V;1^9c1;B__[_a95@JB;_41
+VKb@0CFfMQ75@PNg?=Z?mg2
 r1
 !s85 0
 31
 !i10b 1
-!s100 XAbD]1M1M06K^b`id`>Y91
-I;1^9c1;B__[_a95@JB;_41
+!s100 [6IWN^giB7<^lP`h`QfH00
+IKb@0CFfMQ75@PNg?=Z?mg2
 !i103 1
 S1
 R2
@@ -58,15 +58,15 @@ R10
 R11
 vgcn_tb
 R0
-!s110 1681087865
+!s110 1681105104
 !i10b 1
-!s100 90g670b28[RNbLSI[cmK?1
-I>mYg]0V:Vmj6X]__FKbjM2
+!s100 bZ1;I6Y?ccnm]<OjA6XXD2
+IBHkE:z`mSkVZA_igE^2SO0
 R1
 !s105 gcn_tb_sv_unit
 S1
 R2
-w1681085722
+w1681105102
 8C:/Users/npdho/Desktop/Lab4/testbench/gcn_tb.sv
 FC:/Users/npdho/Desktop/Lab4/testbench/gcn_tb.sv
 F./params.vh
@@ -79,7 +79,7 @@ R6
 r1
 !s85 0
 31
-R7
+!s108 1681105104.000000
 !s107 ./finish_subtask.sv|./clk_gen_reset_subtask.sv|./parametrized_decode_subtask.sv|./tasks_to_read_txt.sv|./params.vh|C:/Users/npdho/Desktop/Lab4/testbench/gcn_tb.sv|
 !s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/Users/npdho/Desktop/Lab4/testbench/gcn_tb.sv|
 !i113 1
