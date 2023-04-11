@@ -13,18 +13,17 @@ module gcn (
     output logic [num_of_cols_fm-1:0] [6:0] input_addr_fm,
     output logic output_we,
     output logic [num_of_outs-1:0] [2:0] output_addr,
-    output logic [num_of_outs-1:0] [9:0] aggregated_out,
-    output logic [num_of_outs-1:0] [6:0] aggregated_address,
+    //output logic [num_of_outs-1:0] [9:0] aggregated_out,
+    //output logic [num_of_outs-1:0] [6:0] aggregated_address,
     output logic done
 );
 
     logic [7:0] i, j;
     logic start_r; 
     logic [num_of_cols_fm-1:0] [num_of_elements_in_col-1:0] [BW-1:0]  col_features_r;
-    logic [num_of_rows_wm-1:0] [num_of_elements_in_row-1:0] [BW-1:0]  row_weights_r;
+    logic [num_of_rows_wm-1:0] [1:0] [BW-1:0]  row_weights_r;
     logic [1:0] [5:0] [2:0]  coo_mat_r; 
     logic [num_of_nodes-1:0][9:0] ag1, ag2; //1st/2nd col  vs first
-
 
     //////////////////////////////////////////////////////////////////////////////////////////////
     //                        Input and output registers
@@ -50,25 +49,16 @@ module gcn (
             for (i=8'b0; i<num_of_outs; i++) begin
                     y[i]<=3'b0; //i is the column, j is the element in the column
             end
-            for (i=7'b0; i<num_of_outs; i++) begin
-                aggregated_out[i] <= 10'b0;
-            end
             done <= 1'b0; 
         end
         else begin
             if(input_re == 1'b1) begin
                 col_features_r <= col_features;
-                row_weights_r  <= row_weights;
                 coo_mat_r   <= coo_mat;
+                row_weights_r  <= row_weights[0];
+                
             end
             if(output_we == 1'b1) begin
-                aggregated_out[0] <= ag1[0];
-                aggregated_out[1] <= ag1[1];
-                aggregated_out[2] <= ag1[2];
-                aggregated_out[3] <= ag1[3];
-                aggregated_out[4] <= ag1[4];
-                aggregated_out[5] <= ag1[5];
-                
             end
         end
     end
@@ -114,7 +104,7 @@ module gcn (
             feat_ag : begin
                 adj_en = 1'b1; 
                 feat_ag_en = 1'b1; 
-                output_we = 1'b1;
+                //output_we = 1'b1;
                 input_re = 1'b1; 
                 if(feat_ag_done == 1'b1)
                     next_state = hold; 
@@ -438,59 +428,49 @@ module gcn (
 //assign feat_ag_done = (mat_cnt > num_of_rows_in_f_mem-1)? 1'b1 : 1'b0; 
 //logic input_re, output_we;
 //logic add_cnt_en, add_rst, out_add_en, agg_add_en;
-logic [num_of_outs-1:0][6:0] next_ag_addr, next_input_addr_fm; 
+logic [num_of_cols_fm-1:0][6:0] next_input_addr_fm, next_input_addr_wm; 
 logic [2:0] i3; 
     always_ff @( posedge clk or negedge rst_n ) begin : cnt_regs
         if (~rst_n) begin
-                /*for (i=2'b0; i<num_of_rows_wm; i++) begin
+                for (i=2'b0; i<num_of_rows_wm; i++) begin
                     input_addr_wm[i] <= i;
-                end*/
+                end
                 for (i=7'b0; i<num_of_cols_fm; i++) begin
                     input_addr_fm[i] <= i;
-                     
-                end
-                for(i=7'b0; i<num_of_outs; i++) begin
-                    aggregated_address[i] <= 7'b0;
                 end
         end
         else begin
             if(output_we) begin
-                aggregated_address <= next_ag_addr; 
+
             end
             if(input_re) begin
                input_addr_fm <= next_input_addr_fm; 
+               input_addr_wm <= next_input_addr_wm; 
             end
         end
     end
 
-    assign next_ag_addr[0] =  7'd0;
-    assign next_ag_addr[1] =  7'd0;
-    assign next_ag_addr[2] =  7'd0;
-    assign next_ag_addr[3] =  7'd3;
-    assign next_ag_addr[4] =  7'd4;
-    assign next_ag_addr[5] =  7'd5;
 
     always_comb begin
 
         next_input_addr_fm[0] = 7'd0;
         next_input_addr_fm[1] = 7'd0;
 
-        /*if(output_we) begin
-            for(i3=7'b0; i3<num_of_outs; i3++) begin
-                //next_ag_addr[i3] = aggregated_address[i3] + 7'd1;  
-            end
-        end
-        else begin
-            next_ag_addr[0] = 7'd0; 
-            next_ag_addr[1] = 7'd1;
-            next_ag_addr[2] = 7'd2; 
-            next_ag_addr[3] = 7'd3;
-            next_ag_addr[4] = 7'd4; 
-            next_ag_addr[5] = 7'd5;
-        end*/
+        next_input_addr_wm[0] = 7'd0;
+        next_input_addr_wm[1] = 7'd0;
+        next_input_addr_wm[2] = 7'd0;
+        
+        //next_input_addr_wm[1] = 7'd0;
+
         if(input_re) begin
             next_input_addr_fm[0] = input_addr_fm[0] + 7'd2;
             next_input_addr_fm[1] = input_addr_fm[1] + 7'd2;
+            
+            next_input_addr_wm[0] = input_addr_wm[0] + 7'd3;
+            next_input_addr_wm[1] = input_addr_wm[1] + 7'd3;
+            next_input_addr_wm[2] = input_addr_wm[2] + 7'd3;
+            
+            //next_input_addr_wm[1] = input_addr_fm[1] + 7'd2;
         end
         
 

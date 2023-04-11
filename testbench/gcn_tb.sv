@@ -52,8 +52,8 @@ gcn DUT (.clk(clk),
          .input_addr_fm(input_addr_fm_col),
          .output_we(output_we),
          .output_addr(output_addr),
-         .aggregated_out(aggregated_out),
-         .aggregated_address(aggregated_address),
+         //.aggregated_out(aggregated_out),
+         //.aggregated_address(aggregated_address),
          .done(done)
 );
 //-----------------------------------------//
