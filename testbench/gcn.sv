@@ -21,9 +21,11 @@ module gcn (
     logic [7:0] i, j;
     logic start_r; 
     logic [num_of_cols_fm-1:0] [num_of_elements_in_col-1:0] [BW-1:0]  col_features_r;
-    logic [num_of_rows_wm-1:0] [1:0] [BW-1:0]  row_weights_r;
+    logic [1:0] [2:0] [BW-1:0]  row_weights_r;
     logic [1:0] [5:0] [2:0]  coo_mat_r; 
     logic [num_of_nodes-1:0][9:0] ag1, ag2; //1st/2nd col  vs first
+    logic [6:0] wm_addr;
+    logic feat_ag_en;
 
     //////////////////////////////////////////////////////////////////////////////////////////////
     //                        Input and output registers
@@ -55,8 +57,12 @@ module gcn (
             if(input_re == 1'b1) begin
                 col_features_r <= col_features;
                 coo_mat_r   <= coo_mat;
-                row_weights_r  <= row_weights[0];
-                
+            end
+            if(feat_ag_en) begin
+                for(i=0; i<num_of_rows_wm ; i++) begin 
+                    row_weights_r[0][i]  <= row_weights[i][wm_addr-:6];
+                    row_weights_r[1][i]  <= row_weights[i][wm_addr+6'd5-:6];
+                end
             end
             if(output_we == 1'b1) begin
             end
@@ -70,7 +76,7 @@ module gcn (
     state_t state, next_state;
     logic adj_en; 
     logic adj_done, adj_done_b;
-    logic feat_ag_en, feat_ag_done;
+    logic feat_ag_done;
     logic add_cnt_en, add_rst, out_add_en, ag_add_en;
     always_ff @( posedge clk or negedge rst_n ) begin : FSM
         if(~rst_n)
@@ -428,7 +434,8 @@ module gcn (
 //assign feat_ag_done = (mat_cnt > num_of_rows_in_f_mem-1)? 1'b1 : 1'b0; 
 //logic input_re, output_we;
 //logic add_cnt_en, add_rst, out_add_en, agg_add_en;
-logic [num_of_cols_fm-1:0][6:0] next_input_addr_fm, next_input_addr_wm; 
+logic [num_of_cols_fm-1:0][6:0] next_input_addr_fm; 
+logic [6:0] next_wm_addr;
 logic [2:0] i3; 
     always_ff @( posedge clk or negedge rst_n ) begin : cnt_regs
         if (~rst_n) begin
@@ -438,6 +445,7 @@ logic [2:0] i3;
                 for (i=7'b0; i<num_of_cols_fm; i++) begin
                     input_addr_fm[i] <= i;
                 end
+                wm_addr <= 7'd5; 
         end
         else begin
             if(output_we) begin
@@ -445,7 +453,7 @@ logic [2:0] i3;
             end
             if(input_re) begin
                input_addr_fm <= next_input_addr_fm; 
-               input_addr_wm <= next_input_addr_wm; 
+               wm_addr <= next_wm_addr;
             end
         end
     end
@@ -455,24 +463,16 @@ logic [2:0] i3;
 
         next_input_addr_fm[0] = 7'd0;
         next_input_addr_fm[1] = 7'd0;
-
-        next_input_addr_wm[0] = 7'd0;
-        next_input_addr_wm[1] = 7'd0;
-        next_input_addr_wm[2] = 7'd0;
-        
-        //next_input_addr_wm[1] = 7'd0;
+      
+        next_wm_addr = 7'd5;
 
         if(input_re) begin
             next_input_addr_fm[0] = input_addr_fm[0] + 7'd2;
             next_input_addr_fm[1] = input_addr_fm[1] + 7'd2;
-            
-            next_input_addr_wm[0] = input_addr_wm[0] + 7'd3;
-            next_input_addr_wm[1] = input_addr_wm[1] + 7'd3;
-            next_input_addr_wm[2] = input_addr_wm[2] + 7'd3;
-            
-            //next_input_addr_wm[1] = input_addr_fm[1] + 7'd2;
         end
-        
+        if(feat_ag_en) begin
+            next_wm_addr = wm_addr + 7'd10;
+        end
 
     end
      
