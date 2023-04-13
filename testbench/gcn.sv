@@ -24,7 +24,7 @@ module gcn (
     logic [1:0] [2:0] [BW-1:0]  row_weights_r;
     logic [1:0] [5:0] [2:0]  coo_mat_r; 
     logic [num_of_nodes-1:0][9:0] ag1, ag2; //1st/2nd col  vs first
-    logic [8:0] wm_addr;
+    logic [9:0] wm_addr;
     logic feat_ag_en;
 
     //////////////////////////////////////////////////////////////////////////////////////////////
@@ -55,8 +55,9 @@ module gcn (
         end
         else begin
             if(input_re == 1'b1) begin
-                col_features_r <= col_features;
                 coo_mat_r   <= coo_mat;
+                if(feat_ag_en)
+                    col_features_r <= col_features;
             end
             if(feat_ag_en) begin
                 for(i=0; i<num_of_rows_wm ; i++) begin 
@@ -90,7 +91,6 @@ module gcn (
         input_re  = 1'b0; 
         output_we  = 1'b0;
         feat_trans_en = 1'b0;  
-        feat_trans_done = 1'b0;
         next_state = init;
         adj_en = 0; 
         feat_ag_en = 0; 
@@ -113,8 +113,11 @@ module gcn (
             feat_ag : begin
                 //adj_en = 1'b1; 
                 feat_ag_en = 1'b1; 
-                input_re = 1'b1;  
-                next_state = feat_ag_trans;
+                input_re = 1'b1; 
+                if (input_addr_fm[0]>1)
+                    next_state = feat_ag_trans;
+                else 
+                    next_state = feat_ag; 
             end
             feat_ag_trans: begin
                 feat_ag_en = 1'b1; 
@@ -143,7 +146,7 @@ module gcn (
         endcase
     end
     assign feat_ag_done = (input_addr_fm[0]<7'd96)? 1'b0 : 1'b1; 
-    assign feat_tans_done = (wm_addr<8'd485)? 1'b0 : 1'b1; 
+    assign feat_trans_done = (wm_addr<10'd495)? 1'b0 : 1'b1; 
     //////////////////////////////////////////////////////////////////////////////////////////////
     //                        Adjaceny Matrix creation
     //////////////////////////////////////////////////////////////////////////////////////////////
@@ -452,7 +455,7 @@ module gcn (
 //logic input_re, output_we;
 //logic add_cnt_en, add_rst, out_add_en, agg_add_en;
 logic [num_of_cols_fm-1:0][6:0] next_input_addr_fm; 
-logic [8:0] next_wm_addr;
+logic [9:0] next_wm_addr;
 logic [2:0] i3; 
     always_ff @( posedge clk or negedge rst_n ) begin : cnt_regs
         if (~rst_n) begin
@@ -483,12 +486,12 @@ logic [2:0] i3;
       
         next_wm_addr = 7'd5;
 
-        if(input_re & feat_ag_en) begin
+        if( feat_ag_en) begin
             next_input_addr_fm[0] = input_addr_fm[0] + 7'd2;
             next_input_addr_fm[1] = input_addr_fm[1] + 7'd2;
         end
         if(input_re & feat_trans_en) begin
-            next_wm_addr = wm_addr + 7'd10;
+            next_wm_addr = wm_addr + 10'd10;
         end
 
     end
