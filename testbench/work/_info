@@ -10,23 +10,23 @@ cModel Technology
 dC:/Users/npdho/Desktop/Lab4/source
 vgcn
 Z0 DXx6 sv_std 3 std 0 22 AD7iAPLo6nTIKk<N0eo=D3
-DXx4 work 11 gcn_sv_unit 0 22 ZIl@aAXIVH[=[iJCfJg;o0
+DXx4 work 11 gcn_sv_unit 0 22 oVGKo4i?><S;hUX0CF]o;0
 Z1 VDg1SIo80bB@j0V0VzS_@n1
 r1
 !s85 0
 31
 !i10b 1
-!s100 1L_[18NC;B5CB^mHCckD<3
-I@bG]0B`ePgUJgcladhC9c2
+!s100 >YoK?A1nYG@`Zb=[4F1Yf3
+IDV3dJIk2ZW85I0m;0hiAf1
 !s105 gcn_sv_unit
 S1
 Z2 dC:/Users/npdho/Desktop/Lab4/testbench
-Z3 w1681395330
+Z3 w1681505460
 Z4 8C:\Users\npdho\Desktop\Lab4\testbench\gcn.sv
 Z5 FC:\Users\npdho\Desktop\Lab4\testbench\gcn.sv
 L0 3
 Z6 OV;L;10.5b;63
-Z7 !s108 1681395339.000000
+Z7 !s108 1681505462.000000
 Z8 !s107 params.vh|C:\Users\npdho\Desktop\Lab4\testbench\gcn.sv|
 Z9 !s90 -reportprogress|300|-work|work|-sv|-stats=none|C:\Users\npdho\Desktop\Lab4\testbench\gcn.sv|
 !i113 1
@@ -34,13 +34,13 @@ Z10 o-work work -sv
 Z11 tCvgOpt 0
 Xgcn_sv_unit
 R0
-VZIl@aAXIVH[=[iJCfJg;o0
+VoVGKo4i?><S;hUX0CF]o;0
 r1
 !s85 0
 31
 !i10b 1
-!s100 WM71ZUPWK4cd3ozM;5`Ka1
-IZIl@aAXIVH[=[iJCfJg;o0
+!s100 <gcEW22MXlbM27UaWVHz]3
+IoVGKo4i?><S;hUX0CF]o;0
 !i103 1
 S1
 R2

@@ -26,6 +26,7 @@ module gcn (
     logic [num_of_nodes-1:0][9:0] ag1, ag2; //1st/2nd col  vs first
     logic [9:0] wm_addr;
     logic feat_ag_en;
+    logic [num_of_outs-1:0] [2:0] pre_y;
 
     //////////////////////////////////////////////////////////////////////////////////////////////
     //                        Input and output registers
@@ -50,6 +51,7 @@ module gcn (
             end
             for (i=8'b0; i<num_of_outs; i++) begin
                     y[i]<=3'b0; //i is the column, j is the element in the column
+                    output_addr [i] <= i; 
             end
             done <= 1'b0; 
         end
@@ -66,6 +68,7 @@ module gcn (
                 end
             end
             if(output_we == 1'b1) begin
+                y <= pre_y;
             end
         end
     end
@@ -73,13 +76,18 @@ module gcn (
     //////////////////////////////////////////////////////////////////////////////////////////////
     //                        Finite State Machine
     //////////////////////////////////////////////////////////////////////////////////////////////
-    typedef enum {init, fetch, adj, feat_ag, feat_ag_trans, feat_trans, hold} state_t;
+    typedef enum {init, fetch, adj, feat_ag, feat_ag_trans, feat_trans, out, hold} state_t;
     state_t state, next_state;
     logic adj_en; 
     logic adj_done, adj_done_b;
     logic feat_ag_done;
     logic add_cnt_en, add_rst, out_add_en, ag_add_en;
     logic feat_trans_en, feat_trans_done;
+    logic out_en; 
+    logic out_done;
+    logic [2:0] out_cnt;
+    logic write_out_en;
+
     always_ff @( posedge clk or negedge rst_n ) begin : FSM
         if(~rst_n)
             state <= init;
@@ -92,8 +100,10 @@ module gcn (
         output_we  = 1'b0;
         feat_trans_en = 1'b0;  
         next_state = init;
-        adj_en = 0; 
-        feat_ag_en = 0; 
+        adj_en = 1'b0; 
+        feat_ag_en = 1'b0; 
+        out_en = 1'b0; 
+        output_we = 1'd0; 
         case (state)
             init : begin //reset state
                 if(start==1'b1) 
@@ -133,11 +143,22 @@ module gcn (
                 input_re = 1'b1; 
                 feat_trans_en = 1'b1; 
                 if(feat_trans_done == 1'b1)
-                    next_state = hold; 
+                    next_state = out; 
                 else
                     next_state = feat_trans;   
             end
+            out : begin
+                out_en = 1'b1;
+                if(out_done) begin
+                    next_state = hold;
+                    output_we = 1'b1;
+                end
+                else
+                    next_state = out;
+
+            end
             hold : begin
+                output_we = 1'b1;
                 next_state = hold; 
             end
             default : begin 
@@ -145,8 +166,9 @@ module gcn (
             end
         endcase
     end
+    assign out_done     = (out_cnt<3'd3)? 1'd0 : 1'd1;
     assign feat_ag_done = (input_addr_fm[0]<7'd96)? 1'b0 : 1'b1; 
-    assign feat_trans_done = (wm_addr<10'd495)? 1'b0 : 1'b1; 
+    assign feat_trans_done = (wm_addr<10'd500)? 1'b0 : 1'b1; 
     //////////////////////////////////////////////////////////////////////////////////////////////
     //                        Adjaceny Matrix creation
     //////////////////////////////////////////////////////////////////////////////////////////////
@@ -543,5 +565,48 @@ logic [2:0] i3;
         end
     end
     
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+//                        argmax
+//////////////////////////////////////////////////////////////////////////////////////////////
+logic [2:0] next_out_cnt, i4, i5;
+//logic [2:0] out_cnt,
+logic [5:0][20:0] out_mat, next_out_mat; 
+//logic [num_of_outs-1:0] [2:0] pre_y, next_pre_y;
+logic [num_of_outs-1:0] [2:0] next_pre_y;
+
+always @(posedge clk or negedge rst_n) begin
+    if(~rst_n) begin
+        out_cnt <= 3'b0; 
+        for (i4=3'b0; i4<6; i4++) begin
+            out_mat[i4] <= 21'd0; 
+            pre_y[i4]   <= 3'd0;  
+        end
+    end
+    else begin
+        if(feat_trans_done) begin
+            out_mat <= next_out_mat; //this needs to start clking in at 1 clk before the cnter
+            pre_y   <= next_pre_y;
+        end
+        if(out_en) begin
+            out_cnt <= next_out_cnt;   
+        end
+    end
+end
+
+assign next_out_cnt = ((out_cnt<3'd3) && out_en && ~out_done)? out_cnt + 1 : 0;
+
+always_comb begin
+    for (i5 = 3'd0; i5<3'd6; i5++) begin
+        if (next_out_mat[i5] < accum_mat[i5][out_cnt]) begin
+            next_out_mat[i5] = accum_mat[i5][out_cnt];
+            next_pre_y [i5]  = out_cnt; 
+        end
+        else begin
+            next_out_mat[i5] = out_mat[i5];
+            next_pre_y[i5]   = next_pre_y[i5];
+        end
+    end
+end
 
 endmodule
