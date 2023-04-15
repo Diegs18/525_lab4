@@ -1,15 +1,14 @@
 `include "params.vh"
 
-
 module gcn (
-    input   logic clk,
-    input   logic rst_n,
-    input   logic start,
-    input   logic [num_of_cols_fm-1:0] [num_of_elements_in_col*BW-1:0] col_features,
-    input   logic [num_of_rows_wm-1:0] [num_of_elements_in_row*BW-1:0] row_weights,
-    input   logic [1:0] [17:0] coo_mat,
-    output  logic [num_of_outs-1:0] [2:0] y,
-    output  logic input_re,
+    input  logic clk,
+    input  logic rst_n,
+    input  logic start,
+    input  logic [num_of_cols_fm-1:0] [num_of_elements_in_col*BW-1:0] col_features,
+    input  logic [num_of_rows_wm-1:0] [num_of_elements_in_row*BW-1:0] row_weights,
+    input  logic [1:0] [17:0] coo_mat,
+    output logic [num_of_outs-1:0] [2:0] y,
+    output logic input_re,
     output logic [num_of_rows_wm-1:0] [1:0] input_addr_wm,
     output logic [num_of_cols_fm-1:0] [6:0] input_addr_fm,
     output logic output_we,
@@ -34,6 +33,7 @@ module gcn (
     //////////////////////////////////////////////////////////////////////////////////////////////
     always_ff @( posedge clk or negedge rst_n) begin : in_out_regs
         if(~rst_n) begin
+            start_r <= 1'b0;
             for (i=8'b0; i<num_of_cols_fm; i++) begin
                 for (j=8'b0; j<num_of_elements_in_col; j++) begin
                     col_features_r[i][j]<=5'b0; //i is the column, j is the element in the column
@@ -53,24 +53,22 @@ module gcn (
                     y[i]<=3'b0; //i is the column, j is the element in the column
                     output_addr [i] <= i; 
             end
-            //done <= 1'b0; 
+            done <= 1'b0; 
         end
         else begin
-            if(start == 1'b1) begin
-                if(input_re == 1'b1) begin
-                    coo_mat_r   <= coo_mat;
-                    if(feat_ag_en)
-                        col_features_r <= col_features;
+            if(input_re == 1'b1) begin
+                coo_mat_r   <= coo_mat;
+                if(feat_ag_en)
+                    col_features_r <= col_features;
+            end
+            if(feat_ag_en) begin
+                for(i=0; i<num_of_rows_wm ; i++) begin 
+                    row_weights_r[0][i]  <= row_weights[i][wm_addr-:6];
+                    row_weights_r[1][i]  <= row_weights[i][wm_addr+6'd5-:6];
                 end
-                if(feat_ag_en) begin
-                    for(i=0; i<num_of_rows_wm ; i++) begin 
-                        row_weights_r[0][i]  <= row_weights[i][wm_addr-:6];
-                        row_weights_r[1][i]  <= row_weights[i][wm_addr+6'd5-:6];
-                    end
-                end
-                if(output_we == 1'b1) begin
-                    y <= pre_y;
-                end
+            end
+            if(output_we == 1'b1) begin
+                y <= pre_y;
             end
         end
     end
@@ -90,7 +88,6 @@ module gcn (
     logic [2:0] out_cnt;
     logic write_out_en;
 
-
     always_ff @( posedge clk or negedge rst_n ) begin : FSM
         if(~rst_n)
             state <= init;
@@ -106,8 +103,7 @@ module gcn (
         adj_en = 1'b0; 
         feat_ag_en = 1'b0; 
         out_en = 1'b0; 
-        output_we = 1'd0;
-	done = 1'b0;  
+        output_we = 1'd0; 
         case (state)
             init : begin //reset state
                 if(start==1'b1) 
@@ -122,7 +118,7 @@ module gcn (
                 if (adj_done == 1'b1)
                    next_state = feat_ag;
                 else 
-                    next_state = adj; 
+                    next_state <= adj; 
             end
             feat_ag : begin
                 //adj_en = 1'b1; 
@@ -163,7 +159,6 @@ module gcn (
             end
             hold : begin
                 output_we = 1'b1;
-		        done = 1'b1; 
                 next_state = hold; 
             end
             default : begin 
@@ -545,7 +540,6 @@ logic [2:0] i3;
             if(feat_trans_en) begin
                 trans_mat1 <= next_trans_mat1; 
                 trans_mat2 <= next_trans_mat2;
-
                 accum_mat <= next_accum_mat;
             end
         end

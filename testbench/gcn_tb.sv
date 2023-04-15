@@ -85,8 +85,8 @@ always @(negedge clk) begin
    reset_dut();   // Resets the design -- active high reset.
    start_valid(); // Provides the start valid signal and also stops the start signal when done singal is provided by the GCN module
    send_features_weights_COO_WB(); // Performs the memory decode to give the features weights and COO matrix and also performs the write back
-   compare_online(); // For onine students to compare the design outs with golden outs(Aggregation only) !!!!!!
-   //compare_F2F(); // For F2F students to compare the design outs with golden outs !!!!!!!!!!!!
+   //compare_online(); // For onine students to compare the design outs with golden outs(Aggregation only) !!!!!!
+   compare_F2F(); // For F2F students to compare the design outs with golden outs !!!!!!!!!!!!
 
 end
 //------------------------------------------------//
