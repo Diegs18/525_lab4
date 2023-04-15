@@ -1,6 +1,6 @@
 //---------------Variable Params------------// !!!!!!!! NOT MEANT TO BE CHANGED !!!!!!!!!!!!
 parameter run_time = 100000; // Run time of the design
-parameter clk_period = 10; //In pico seconds
+parameter clk_period = 510; //In pico seconds
 parameter num_of_cols_fm = 2;  // Change to modify the number of cols in feature matrix you can take -- MAX VALUE = 96
 parameter num_of_rows_wm = 3;  // Change to modify the number of cols in weight matrix you can take -- MAX_VALUE = 3
 parameter num_of_rows_fm = 6;  // Change to modify the number of rows in feature matrix you can take -- MAX_VALUE = 6

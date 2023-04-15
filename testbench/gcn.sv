@@ -529,7 +529,7 @@ logic [2:0] i3;
 //logic [num_of_nodes-1:0][9:0] ag1, ag2; //1st/2nd col  vs first
 //logic [1:0] [2:0] [BW-1:0]  row_weights_r
     logic [5:0][2:0][20:0]trans_mat1, trans_mat2, next_trans_mat1, next_trans_mat2;
-    logic [5:0][2:0][20:0]accum_mat, next_accum_mat;
+    logic [5:0][2:0][20:0]accum_mat1, accum_mat2, next_accum_mat1, next_accum_mat2;
     logic [7:0] ii, jj, iii, jjj;
     always_ff @( posedge clk or negedge rst_n) begin : mult_accum
         if(~rst_n) begin
@@ -537,7 +537,8 @@ logic [2:0] i3;
                 for ( j=7'b0; j<num_of_rows_wm; j++) begin
                     trans_mat1[i][j] <= 21'b0;
                     trans_mat2[i][j] <= 21'b0;
-                    accum_mat[i][j] <= 21'b0;
+                    accum_mat1[i][j] <= 21'b0;
+                    accum_mat2[i][j] <= 21'b0;
                 end
             end
         end
@@ -545,8 +546,8 @@ logic [2:0] i3;
             if(feat_trans_en) begin
                 trans_mat1 <= next_trans_mat1; 
                 trans_mat2 <= next_trans_mat2;
-
-                accum_mat <= next_accum_mat;
+                accum_mat1 <= next_accum_mat1;
+                accum_mat2 <= next_accum_mat2;
             end
         end
     end
@@ -557,15 +558,14 @@ logic [2:0] i3;
                 next_trans_mat1[ii][jj] = ag1[ii] * row_weights_r[0][jj];
                 next_trans_mat2[ii][jj] = ag2[ii] * row_weights_r[1][jj];
            end
-        end
-        
-        
+        end        
     end
 
     always_comb begin : accumulate
         for ( iii=7'b0; iii<num_of_outs; iii++) begin
             for ( jjj=7'b0; jjj<num_of_rows_wm; jjj++) begin
-                next_accum_mat[iii][jjj] = accum_mat[iii][jjj] + trans_mat1[iii][jjj] + trans_mat2[iii][jjj];
+                next_accum_mat1[iii][jjj] = trans_mat1[iii][jjj] + trans_mat2[iii][jjj];
+                next_accum_mat2[iii][jjj] = accum_mat1[iii][jjj] + accum_mat2[iii][jjj];
             end
         end
     end
@@ -603,8 +603,8 @@ assign next_out_cnt = ((out_cnt<3'd3) && out_en && ~out_done)? out_cnt + 1 : 0;
 
 always_comb begin
     for (i5 = 3'd0; i5<3'd6; i5++) begin
-        if (next_out_mat[i5] < accum_mat[i5][out_cnt]) begin
-            next_out_mat[i5] = accum_mat[i5][out_cnt];
+        if (next_out_mat[i5] < accum_mat2[i5][out_cnt]) begin
+            next_out_mat[i5] = accum_mat2[i5][out_cnt];
             next_pre_y [i5]  = out_cnt; 
         end
         else begin

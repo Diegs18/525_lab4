@@ -59,6 +59,7 @@ gcn DUT (.clk(clk),
 //-----------------------------------------//
 
 
+
 //---------Memory Initialization------------//
 logic  [BW-1:0] Feature_matrix_memory [num_of_rows_in_f_mem]  [num_of_elements_in_row]; //Each row of the memory has 96 features i.e 6x96 sized feature matrix
 logic  [BW-1:0] Aggregated_matrix_memory_golden [num_of_rows_in_f_mem]  [num_of_elements_in_row]; // Has the Feature aggregation outs(If aggregation is performed first)
