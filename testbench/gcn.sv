@@ -251,33 +251,27 @@ module gcn (
 //////////////////////////////////////////////////////////////////////////////////////////////
 //                        Feature aggregation
 //////////////////////////////////////////////////////////////////////////////////////////////
-    logic [5:0] feat_sel0, feat_sel1, feat_sel2, feat_sel3, feat_sel4, feat_sel5;
+    logic [5:0][5:0] feat_sel;//, feat_sel1, feat_sel2, feat_sel3, feat_sel4, feat_sel5;
     logic [2:0] mat_cnt ;
     logic [2:0] next_mat_cnt ;
-
-    logic [num_of_nodes-1:0][BW-1:0] elements10, elements20;// //the 1st and 2nd clocked col vs 1st adj_row
-    logic [num_of_nodes-1:0][BW-1:0] elements11, elements21;// //the 1st and 2nd clocked col vs 2nd adj_row
-    logic [num_of_nodes-1:0][BW-1:0] elements12, elements22;// //the 1st and 2nd clocked col vs 3rd adj_row
-    logic [num_of_nodes-1:0][BW-1:0] elements13, elements23;// //the 1st and 2nd clocked col vs 4th adj_row
-    logic [num_of_nodes-1:0][BW-1:0] elements14, elements24;// //the 1st and 2nd clocked col vs 5th adj_row
-    logic [num_of_nodes-1:0][BW-1:0] elements15, elements25;// //the 1st and 2nd clocked col vs 6th adj_row
+    logic [7:0] i2;
+    logic [num_of_elements_in_col-1:0][num_of_nodes-1:0][BW-1:0] elements1, elements2;// //the 1st and 2nd clocked col vs 1st adj_row
+    //logic [num_of_nodes-1:0][BW-1:0] elements11, elements21;// //the 1st and 2nd clocked col vs 2nd adj_row
+    //logic [num_of_nodes-1:0][BW-1:0] elements12, elements22;// //the 1st and 2nd clocked col vs 3rd adj_row
+    //logic [num_of_nodes-1:0][BW-1:0] elements13, elements23;// //the 1st and 2nd clocked col vs 4th adj_row
+    //logic [num_of_nodes-1:0][BW-1:0] elements14, elements24;// //the 1st and 2nd clocked col vs 5th adj_row
+    //logic [num_of_nodes-1:0][BW-1:0] elements15, elements25;// //the 1st and 2nd clocked col vs 6th adj_row
 
     //logic [num_of_nodes-1:0][9:0] ag1, ag2; //1st/2nd col  vs first
     always_ff @( posedge clk or negedge rst_n ) begin : feat_ag_reg
         if(~rst_n) begin
+            for(j = 8'd0; j<6; j++) begin
+                for(i=8'd0; i<num_of_nodes; i++) begin
+                    elements1[j][i] <= {BW-1{1'b0}}; 
+                    elements2[j][i] <= {BW-1{1'b0}};
+                end
+            end
             for(i=8'd0; i<num_of_nodes; i++) begin
-                elements10[i] <= {BW-1{1'b0}}; 
-                elements20[i] <= {BW-1{1'b0}};
-                elements11[i] <= {BW-1{1'b0}}; 
-                elements21[i] <= {BW-1{1'b0}};
-                elements12[i] <= {BW-1{1'b0}}; 
-                elements22[i] <= {BW-1{1'b0}};
-                elements13[i] <= {BW-1{1'b0}}; 
-                elements23[i] <= {BW-1{1'b0}};
-                elements14[i] <= {BW-1{1'b0}}; 
-                elements24[i] <= {BW-1{1'b0}};
-                elements15[i] <= {BW-1{1'b0}}; 
-                elements25[i] <= {BW-1{1'b0}};
                 ag1[i] <= 10'd0; 
                 ag2[i] <= 10'd0; 
             end
@@ -286,188 +280,29 @@ module gcn (
             if(feat_ag_en) begin
                 
                 ////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-                if(feat_sel0[0] == 1) begin
-                    elements10[0] <= col_features_r[0][0];
-                    elements20[0] <= col_features_r[1][0];
-                end
-                if(feat_sel0[1] == 1) begin
-                    elements10[1] <= col_features_r[0][1];
-                    elements20[1] <= col_features_r[1][1]; 
-                end
-                if(feat_sel0[2] == 1) begin
-                    elements10[2] <= col_features_r[0][2];
-                    elements20[2] <= col_features_r[1][2]; 
-                end
-                if(feat_sel0[3] == 1) begin
-                    elements10[3] <= col_features_r[0][3]; 
-                    elements20[3] <= col_features_r[1][3];
-                end
-                if(feat_sel0[4] == 1) begin
-                    elements10[4] <= col_features_r[0][4];
-                    elements20[4] <= col_features_r[1][4]; 
-                end
-                if(feat_sel0[5] == 1) begin
-                    elements10[5] <= col_features_r[0][5];
-                    elements20[5] <= col_features_r[1][5];
-                end
-                ag1[0] <= elements10[0] + elements10[1] + elements10[2] + elements10[3] + elements10[4] + elements10[5]; 
-                ag2[0] <= elements20[0] + elements20[1] + elements20[2] + elements20[3] + elements20[4] + elements20[5]; 
-                
+                for(j = 8'd0; j<6; j++) begin
+                    for(i = 8'd0; i<6; i++) begin
+                        if(feat_sel[j][i] == 1) begin
+                            elements1[j][i] <= col_features_r[0][i];
+                            elements2[j][i] <= col_features_r[1][i];
+                        end
+                    end                    
+                    ag1[j] <= elements1[j][0] + elements1[j][1] + elements1[j][2] + elements1[j][3] + elements1[j][4] + elements1[j][5]; 
+                    ag2[j] <= elements2[j][0] + elements2[j][1] + elements2[j][2] + elements2[j][3] + elements2[j][4] + elements2[j][5]; 
+                end                
                 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-                if(feat_sel1[0] == 1) begin
-                    elements11[0] <= col_features_r[0][0];
-                    elements21[0] <= col_features_r[1][0];
-                end
-                if(feat_sel1[1] == 1) begin
-                    elements11[1] <= col_features_r[0][1];
-                    elements21[1] <= col_features_r[1][1]; 
-                end
-                if(feat_sel1[2] == 1) begin
-                    elements11[2] <= col_features_r[0][2];
-                    elements21[2] <= col_features_r[1][2]; 
-                end
-                if(feat_sel1[3] == 1) begin
-                    elements11[3] <= col_features_r[0][3]; 
-                    elements21[0] <= col_features_r[1][3];
-                end
-                if(feat_sel1[4] == 1) begin
-                    elements11[4] <= col_features_r[0][4];
-                    elements21[4] <= col_features_r[1][4]; 
-                end
-                if(feat_sel1[5] == 1) begin
-                    elements11[5] <= col_features_r[0][5];
-                    elements21[5] <= col_features_r[1][5];
-                end
-                ag1[1] <= elements11[0] + elements11[1] + elements11[2] + elements11[3] + elements10[4] + elements11[5]; 
-                ag2[1] <= elements21[0] + elements21[1] + elements21[2] + elements21[3] + elements20[4] + elements21[5]; 
-
-                ////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-                if(feat_sel2[0] == 1) begin
-                    elements12[0] <= col_features_r[0][0];
-                    elements22[0] <= col_features_r[1][0];
-                end
-                if(feat_sel2[1] == 1) begin
-                    elements12[1] <= col_features_r[0][1];
-                    elements22[1] <= col_features_r[1][1]; 
-                end
-                if(feat_sel2[2] == 1) begin
-                    elements12[2] <= col_features_r[0][2];
-                    elements22[2] <= col_features_r[1][2]; 
-                end
-                if(feat_sel2[3] == 1) begin
-                    elements12[3] <= col_features_r[0][3]; 
-                    elements22[0] <= col_features_r[1][3];
-                end
-                if(feat_sel2[4] == 1) begin
-                    elements12[4] <= col_features_r[0][4];
-                    elements22[4] <= col_features_r[1][4]; 
-                end
-                if(feat_sel2[5] == 1) begin
-                    elements12[5] <= col_features_r[0][5];
-                    elements22[5] <= col_features_r[1][5];
-                end
-                ag1[2] <= elements12[0] + elements12[1] + elements12[2] + elements12[3] + elements12[4] + elements12[5]; 
-                ag2[2] <= elements22[0] + elements22[1] + elements22[2] + elements22[3] + elements22[4] + elements22[5]; 
-
-                ////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-                if(feat_sel3[0] == 1) begin
-                    elements13[0] <= col_features_r[0][0];
-                    elements23[0] <= col_features_r[1][0];
-                end
-                if(feat_sel3[1] == 1) begin
-                    elements13[1] <= col_features_r[0][1];
-                    elements23[1] <= col_features_r[1][1]; 
-                end
-                if(feat_sel3[2] == 1) begin
-                    elements13[2] <= col_features_r[0][2];
-                    elements23[2] <= col_features_r[1][2]; 
-                end
-                if(feat_sel3[3] == 1) begin
-                    elements13[3] <= col_features_r[0][3]; 
-                    elements23[0] <= col_features_r[1][3];
-                end
-                if(feat_sel3[4] == 1) begin
-                    elements13[4] <= col_features_r[0][4];
-                    elements23[4] <= col_features_r[1][4]; 
-                end
-                if(feat_sel3[5] == 1) begin
-                    elements13[5] <= col_features_r[0][5];
-                    elements23[5] <= col_features_r[1][5];
-                end
-                ag1[3] <= elements13[0] + elements13[1] + elements13[2] + elements13[3] + elements13[4] + elements13[5]; 
-                ag2[3] <= elements23[0] + elements23[1] + elements23[2] + elements23[3] + elements23[4] + elements23[5]; 
-
-                ////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-                if(feat_sel4[0] == 1) begin
-                    elements14[0] <= col_features_r[0][0];
-                    elements24[0] <= col_features_r[1][0];
-                end
-                if(feat_sel4[1] == 1) begin
-                    elements14[1] <= col_features_r[0][1];
-                    elements24[1] <= col_features_r[1][1]; 
-                end
-                if(feat_sel4[2] == 1) begin
-                    elements14[2] <= col_features_r[0][2];
-                    elements24[2] <= col_features_r[1][2]; 
-                end
-                if(feat_sel4[3] == 1) begin
-                    elements14[3] <= col_features_r[0][3]; 
-                    elements24[0] <= col_features_r[1][3];
-                end
-                if(feat_sel4[4] == 1) begin
-                    elements14[4] <= col_features_r[0][4];
-                    elements24[4] <= col_features_r[1][4]; 
-                end
-                if(feat_sel4[5] == 1) begin
-                    elements14[5] <= col_features_r[0][5];
-                    elements24[5] <= col_features_r[1][5];
-                end
-                ag1[4] <= elements14[0] + elements14[1] + elements14[2] + elements14[3] + elements14[4] + elements14[5]; 
-                ag2[4] <= elements24[0] + elements24[1] + elements24[2] + elements24[3] + elements24[4] + elements24[5]; 
-
-                ////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-                if(feat_sel5[0] == 1) begin
-                    elements15[0] <= col_features_r[0][0];
-                    elements25[0] <= col_features_r[1][0];
-                end
-                if(feat_sel5[1] == 1) begin
-                    elements15[1] <= col_features_r[0][1];
-                    elements25[1] <= col_features_r[1][1]; 
-                end
-                if(feat_sel5[2] == 1) begin
-                    elements15[2] <= col_features_r[0][2];
-                    elements25[2] <= col_features_r[1][2]; 
-                end
-                if(feat_sel5[3] == 1) begin
-                    elements15[3] <= col_features_r[0][3]; 
-                    elements25[0] <= col_features_r[1][3];
-                end
-                if(feat_sel5[4] == 1) begin
-                    elements15[4] <= col_features_r[0][4];
-                    elements25[4] <= col_features_r[1][4]; 
-                end
-                if(feat_sel5[5] == 1) begin
-                    elements15[5] <= col_features_r[0][5];
-                    elements25[5] <= col_features_r[1][5];
-                end
-                ag1[5] <= elements15[0] + elements15[1] + elements15[2] + elements15[3] + elements15[4] + elements15[5]; 
-                ag2[5] <= elements25[0] + elements25[1] + elements25[2] + elements25[3] + elements25[4] + elements25[5]; 
-
+               
             end
         end  
     end
-    assign feat_sel0 = adj_mat[0];
-    assign feat_sel1 = adj_mat[1];
-    assign feat_sel2 = adj_mat[2];
-    assign feat_sel3 = adj_mat[3];
-    assign feat_sel4 = adj_mat[4];
-    assign feat_sel5 = adj_mat[5];
+    
+    always_comb begin : feat_select
+        for(i2=8'b0; i2<6; i2++) begin
+            feat_sel[i2] = adj_mat[i2];
+        end 
+    end
+        
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////

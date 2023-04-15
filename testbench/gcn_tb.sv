@@ -37,9 +37,8 @@ always @(posedge clk) begin // Counter for design
   end
 ////////////////////
 
-
 //----------Module Declaration--------------//
-gcn2 DUT (.clk(clk),
+gcn DUT (.clk(clk),
          .rst_n(rst_n),
          .start(start),
          .col_features(col_features),
