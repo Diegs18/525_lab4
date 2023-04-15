@@ -39,7 +39,7 @@ always @(posedge clk) begin // Counter for design
 
 
 //----------Module Declaration--------------//
-gcn DUT (.clk(clk),
+gcn2 DUT (.clk(clk),
          .rst_n(rst_n),
          .start(start),
          .col_features(col_features),
