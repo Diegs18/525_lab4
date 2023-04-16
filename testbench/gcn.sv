@@ -24,7 +24,7 @@ module gcn (
     logic [num_of_cols_fm-1:0] [num_of_elements_in_col-1:0] [BW-1:0]  col_features_r;
     logic [1:0] [2:0] [BW-1:0]  row_weights_r;
     logic [1:0] [5:0] [2:0]  coo_mat_r; 
-    logic [num_of_nodes-1:0][9:0] ag1, ag2; //1st/2nd col  vs first
+    logic [num_of_nodes-1:0][9:0] ag1, pre_ag1a, pre_ag1b, ag2, pre_ag2a, pre_ag2b; //1st/2nd col  vs first
     logic [9:0] wm_addr;
     logic feat_ag_en;
     logic [num_of_outs-1:0] [2:0] pre_y;
@@ -128,7 +128,7 @@ module gcn (
                 //adj_en = 1'b1; 
                 feat_ag_en = 1'b1; 
                 input_re = 1'b1; 
-                if (input_addr_fm[0]>1)
+                if (input_addr_fm[0]>2)
                     next_state = feat_ag_trans;
                 else 
                     next_state = feat_ag; 
@@ -173,7 +173,7 @@ module gcn (
     end
     assign out_done     = (out_cnt<3'd3)? 1'd0 : 1'd1;
     assign feat_ag_done = (input_addr_fm[0]<7'd96)? 1'b0 : 1'b1; 
-    assign feat_trans_done = (wm_addr<10'd500)? 1'b0 : 1'b1; 
+    assign feat_trans_done = (wm_addr<10'd506)? 1'b0 : 1'b1; 
     //////////////////////////////////////////////////////////////////////////////////////////////
     //                        Adjaceny Matrix creation
     //////////////////////////////////////////////////////////////////////////////////////////////
@@ -256,12 +256,7 @@ module gcn (
     logic [2:0] next_mat_cnt ;
     logic [7:0] i2;
     logic [num_of_elements_in_col-1:0][num_of_nodes-1:0][BW-1:0] elements1, elements2;// //the 1st and 2nd clocked col vs 1st adj_row
-    //logic [num_of_nodes-1:0][BW-1:0] elements11, elements21;// //the 1st and 2nd clocked col vs 2nd adj_row
-    //logic [num_of_nodes-1:0][BW-1:0] elements12, elements22;// //the 1st and 2nd clocked col vs 3rd adj_row
-    //logic [num_of_nodes-1:0][BW-1:0] elements13, elements23;// //the 1st and 2nd clocked col vs 4th adj_row
-    //logic [num_of_nodes-1:0][BW-1:0] elements14, elements24;// //the 1st and 2nd clocked col vs 5th adj_row
-    //logic [num_of_nodes-1:0][BW-1:0] elements15, elements25;// //the 1st and 2nd clocked col vs 6th adj_row
-
+    logic [num_of_nodes-1:0][9:0] next_ag1, next_pre_ag1a, next_pre_ag1b, next_ag2, next_pre_ag2a, next_pre_ag2b;
     //logic [num_of_nodes-1:0][9:0] ag1, ag2; //1st/2nd col  vs first
     always_ff @( posedge clk or negedge rst_n ) begin : feat_ag_reg
         if(~rst_n) begin
@@ -273,27 +268,33 @@ module gcn (
             end
             for(i=8'd0; i<num_of_nodes; i++) begin
                 ag1[i] <= 10'd0; 
-                ag2[i] <= 10'd0; 
+                ag2[i] <= 10'd0;
+                pre_ag1a[i] <= 10'b0; 
+                pre_ag1b[i] <= 10'b0; 
+                pre_ag2a[i] <= 10'b0; 
+                pre_ag2b[i] <= 10'b0; 
             end
         end
         else begin
             if(feat_ag_en) begin
-                
                 ////////////////////////////////////////////////////////////////////////////////////////////////////////
                 for(j = 8'd0; j<6; j++) begin
                     for(i = 8'd0; i<6; i++) begin
-                        if(feat_sel[j][i] == 1) begin
+                        if(feat_sel[j][i] == 1'b1) begin
                             elements1[j][i] <= col_features_r[0][i];
                             elements2[j][i] <= col_features_r[1][i];
                         end
                     end                    
-                    ag1[j] <= elements1[j][0] + elements1[j][1] + elements1[j][2] + elements1[j][3] + elements1[j][4] + elements1[j][5]; 
-                    ag2[j] <= elements2[j][0] + elements2[j][1] + elements2[j][2] + elements2[j][3] + elements2[j][4] + elements2[j][5]; 
-                end                
-                ////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-               
+                end 
             end
+            pre_ag1a <= next_pre_ag1a;
+                pre_ag1b <= next_pre_ag1b;
+
+                pre_ag2a <= next_pre_ag2a;
+                pre_ag2b <= next_pre_ag2b;                  
+                ////////////////////////////////////////////////////////////////////////////////////////////////////////
+                ag1 <= next_ag1;
+                ag2 <= next_ag2; 
         end  
     end
     
@@ -301,6 +302,17 @@ module gcn (
         for(i2=8'b0; i2<6; i2++) begin
             feat_sel[i2] = adj_mat[i2];
         end 
+        for(i2=8'b0; i2<6; i2++) begin
+            next_pre_ag1a[i2] = elements1[i2][0] + elements1[i2][1] + elements1[i2][2];
+            next_pre_ag1b[i2] = elements1[i2][3] + elements1[i2][4] + elements1[i2][5]; 
+        
+            next_pre_ag2a[i2] = elements2[i2][0] + elements2[i2][1] + elements2[i2][2];
+            next_pre_ag2b[i2] = elements2[i2][3] + elements2[i2][4] + elements2[i2][5];
+
+            next_ag1 = pre_ag1a + pre_ag1b;
+            next_ag2 = pre_ag2a + pre_ag2b;
+        end
+
     end
         
 
