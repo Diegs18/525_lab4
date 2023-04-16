@@ -112,10 +112,13 @@ endtask
 int k,l;
 //-------------------------Weight matrix decoder-----------------------------//
 task get_weights_from_memory_looped();
-for(k=0; k<num_of_rows_wm;k++) begin
-for (l=0;l<96;l++) begin
-       row_weights [k] [5*l+4 -: 5] = Weight_matrix_memory[input_addr_wm[k]] [l];
-    end
+for(k=0; k<num_of_elements_in_row_wm;k++) begin
+  for (l=0;l<3;l++) begin
+    row_weights [k][l] = Weight_matrix_memory[l][input_addr_wm+k];
+  end
+  //for (l=0;l<96;l++) begin
+  //  row_weights [k] [5*l+4 -: 5] = Weight_matrix_memory[input_addr_wm[k]] [l];
+  //end
 end
 endtask
 //---------------------------------------------------------------------------// 

@@ -8,11 +8,11 @@ module gcn_tb();
 logic clk,rst_n,start; // ->
 logic [num_of_rows_fm-1:0] [num_of_elements_in_row*BW-1:0] row_features; // Port for feature matrix -> // Rowise decode
 logic [num_of_cols_fm-1:0] [num_of_elements_in_col*BW-1:0] col_features; // Port for feature matrix -> // Added functionality for colwise dedcode.
-logic [num_of_rows_wm-1:0] [num_of_elements_in_row*BW-1:0] row_weights; // Port for weight matrix -> // Weights are transposed for easier access. Hence number of rows
+logic [num_of_elements_in_row_wm-1:0][num_of_rows_wm-1:0] [num_of_elements_in_row_wm*BW-1:0] row_weights; // Port for weight matrix -> // Weights are transposed for easier access. Hence number of rows
 logic [1:0] [17:0] coo_mat; //Port for adjacency matrix ->
 logic [num_of_outs-1:0] [2:0] y; //Port for outputs <-
 logic input_re; // Port for reading memory from TB <-
-logic [num_of_rows_wm-1:0] [1:0] input_addr_wm; // Address for selecting 1-3 rows(transoposed cols) of weights. So max val for num_of_rows_wm = 1-3. <-
+logic [num_of_rows_wm-1:0] [6:0] input_addr_wm; // Address for selecting 1-3 rows(transoposed cols) of weights. So max val for num_of_rows_wm = 1-3. <-
 logic [num_of_rows_fm-1:0] [2:0] input_addr_fm_row; // Address for selecting 1-6 rows of features. So val for num_of_rows_fm = 1-6. <-
 logic [num_of_cols_fm-1:0] [6:0] input_addr_fm_col; // Address for selecting 1-96 cols of features. So val for num_of_cols_fm. <- 1-96. <-
 logic output_we; // <-
