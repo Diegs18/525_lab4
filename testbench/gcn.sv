@@ -51,7 +51,7 @@ module gcn (
             end
             for (i=8'b0; i<num_of_outs; i++) begin
                     y[i]<=3'b0; //i is the column, j is the element in the column
-                    //output_addr [i] <= 0; 
+                    output_addr [i] <= i; 
             end
             //done <= 1'b0; 
         end
@@ -138,8 +138,10 @@ module gcn (
                 //adj_en = 1'b1; 
                 feat_ag_en = 1'b1; 
                 input_re = 1'b1; 
-                if (input_addr_fm[0]>1)
+                if (input_addr_fm[0]>2) begin
                     next_state = feat_ag_trans;
+                    //feat_trans_en = 1'b1;
+                end
                 else 
                     next_state = feat_ag; 
             end
@@ -172,6 +174,7 @@ module gcn (
             end
             out : begin
                 out_en = 1'b1;
+                feat_accum_en =1'b0;
                 if(out_done) begin
                     next_state = hold;
                     output_we = 1'b1;
@@ -193,7 +196,7 @@ module gcn (
     assign out_done     = (out_cnt<3'd3)? 1'd0 : 1'd1;
     assign feat_ag_done = (input_addr_fm[0]<7'd96)? 1'b0 : 1'b1; 
     assign feat_trans_done = (input_addr_wm<'d95)? 1'b0 : 1'b1; 
-    assign feat_accum_done = (feat_accum_cnt<2)? 1'b0 : 1'b0; 
+    assign feat_accum_done = (feat_accum_cnt<2)? 1'b0 : 1'b1; 
     //////////////////////////////////////////////////////////////////////////////////////////////
     //                        Adjaceny Matrix creation
     //////////////////////////////////////////////////////////////////////////////////////////////
@@ -381,11 +384,11 @@ logic [2:0] i3;
         next_wm_addr = 7'd0;
 
         if( feat_ag_en) begin
-            next_input_addr_fm[0] = input_addr_fm[0] + 7'd1;
-            next_input_addr_fm[1] = input_addr_fm[1] + 7'd1;
+            next_input_addr_fm[0] = input_addr_fm[0] + 7'd2;
+            next_input_addr_fm[1] = input_addr_fm[1] + 7'd2;
         end
         if(input_re & feat_trans_en) begin
-            next_wm_addr = input_addr_wm + 7'd1;
+            next_wm_addr = input_addr_wm + 7'd2;
         end
 
     end
@@ -423,7 +426,7 @@ logic [2:0] i3;
             end
         end
     end
-assign next_feat_accum_cnt = (feat_accum_en & ~feat_trans_en & ~out_en)? out_cnt + 1 : 0;
+assign next_feat_accum_cnt = (feat_accum_en & ~feat_trans_en & ~out_en)? feat_accum_cnt + 1 : 0;
 
     always_comb begin : multiply
         for ( ii=7'b0; ii<num_of_outs; ii++) begin
