@@ -25,7 +25,6 @@ module gcn (
     logic [1:0] [2:0] [BW-1:0]  row_weights_r;
     logic [1:0] [5:0] [2:0]  coo_mat_r; 
     logic [num_of_nodes-1:0][9:0] ag1, pre_ag1a, pre_ag1b, ag2, pre_ag2a, pre_ag2b; //1st/2nd col  vs first
-    logic [9:0] wm_addr;
     logic feat_ag_en;
     logic [num_of_outs-1:0] [2:0] pre_y;
 
@@ -352,17 +351,16 @@ module gcn (
 //logic input_re, output_we;
 //logic add_cnt_en, add_rst, out_add_en, agg_add_en;
 logic [num_of_cols_fm-1:0][6:0] next_input_addr_fm; 
-logic [9:0] next_wm_addr;
+logic [6:0] next_wm_addr;
 logic [2:0] i3; 
     always_ff @( posedge clk or negedge rst_n ) begin : cnt_regs
         if (~rst_n) begin
                 //for (i=2'b0; i<num_of_rows_wm; i++) begin
-                    input_addr_wm <= 1;
+                    input_addr_wm <= 7'd0;
                 //end
                 for (i=7'b0; i<num_of_cols_fm; i++) begin
                     input_addr_fm[i] <= i;
                 end
-                wm_addr <= 9'd5; 
         end
         else begin
             if(output_we) begin

@@ -7,13 +7,11 @@ Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  
 Top level modules:
 	gcn2
 
-} {} {}} C:/Users/npdho/Desktop/Lab4/testbench/gcn.sv {2 {vlog -work work -sv -stats=none {C:\Users\npdho\Desktop\Lab4\testbench\gcn.sv}
+} {} {}} C:/Users/npdho/Desktop/Lab4/testbench/gcn_tb.sv {1 {vlog -work work -sv -stats=none C:/Users/npdho/Desktop/Lab4/testbench/gcn_tb.sv
 Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
--- Compiling package gcn_sv_unit
--- Compiling module gcn
-** Warning: C:\Users\npdho\Desktop\Lab4\testbench\gcn.sv(482): (vlog-2182) 'next_out_mat' might be read before written in always_comb or always @* block.
+-- Compiling module gcn_tb
 
 Top level modules:
-	gcn
+	gcn_tb
 
 } {} {}}
