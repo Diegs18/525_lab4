@@ -6,7 +6,7 @@ module gcn (
     input   logic rst_n,
     input   logic start,
     input   logic [num_of_cols_fm-1:0] [num_of_elements_in_col*BW-1:0] col_features,
-    input   logic [num_of_elements_in_row_wm-1:0] [num_of_rows_wm-1:0] [num_of_elements_in_row_wm*BW-1:0] row_weights,
+    input   logic [num_of_elements_in_row_wm-1:0] [num_of_rows_wm-1:0] [BW-1:0] row_weights,
     input   logic [1:0] [17:0] coo_mat,
     output  logic [num_of_outs-1:0] [2:0] y,
     output  logic input_re,
@@ -90,7 +90,7 @@ module gcn (
     logic adj_en; 
     logic adj_done, adj_done_b;
     logic feat_ag_done;
-    logic add_cnt_en, add_rst, out_add_en, ag_add_en;
+    logic add_cnt_en, add_rst, out_add_en;
     logic feat_trans_en, feat_trans_done;
     logic out_en; 
     logic out_done;
@@ -116,7 +116,7 @@ module gcn (
         out_en = 1'b0; 
         output_we = 1'd0;
         feat_accum_en = 1'b0;
-	done = 1'b0;  
+	    done = 1'b0;  
         case (state)
             init : begin //reset state
                 if(start==1'b1) 
@@ -309,7 +309,7 @@ module gcn (
                     end                    
                 end 
             end
-            pre_ag1a <= next_pre_ag1a;
+                pre_ag1a <= next_pre_ag1a;
                 pre_ag1b <= next_pre_ag1b;
 
                 pre_ag2a <= next_pre_ag2a;
@@ -372,21 +372,26 @@ logic [2:0] i3;
             end
         end
     end
-
+    
 
     always_comb begin
-
-        next_input_addr_fm[0] = 7'd0;
-        next_input_addr_fm[1] = 7'd1;
-      
-        next_wm_addr = 7'd0;
-
         if( feat_ag_en) begin
             next_input_addr_fm[0] = input_addr_fm[0] + 7'd2;
             next_input_addr_fm[1] = input_addr_fm[1] + 7'd2;
         end
-        if(input_re & feat_trans_en) begin
+        else begin
+            next_input_addr_fm[0] = 7'd0;
+            next_input_addr_fm[1] = 7'd1;
+        end
+    end
+
+    always_comb begin
+
+        if(feat_trans_en) begin
             next_wm_addr = input_addr_wm + 7'd2;
+        end
+        else begin
+            next_wm_addr = 7'd0;
         end
 
     end
