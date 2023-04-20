@@ -16,8 +16,8 @@ module gcn (
     output logic [num_of_outs-1:0] [2:0] output_addr,
     //output logic [num_of_outs-1:0] [9:0] aggregated_out,
     //output logic [num_of_outs-1:0] [6:0] aggregated_address,
-    output logic done,
-
+    output logic done
+);/*
     //debug outputs
     //output logic [num_of_nodes-1:0][9:0] ag1, pre_ag1a, pre_ag1b, ag2, pre_ag2a, pre_ag2b;
     output logic [5:0][2:0][20:0]trans_mat1_o, trans_mat2_o,
@@ -25,7 +25,7 @@ module gcn (
     output logic [num_of_nodes-1:0][9:0] ag1_o, ag2_o,
     output logic [5:0][2:0][20:0] capture_mat_o,
     output logic [5:0][20:0] out_mat_o
-);
+);*/
 
     logic [5:0][2:0][20:0]trans_mat1, trans_mat2, next_trans_mat1, next_trans_mat2;
     logic [5:0][2:0][20:0]accum_mat1, accum_mat2, next_accum_mat1, next_accum_mat2;
@@ -33,7 +33,7 @@ module gcn (
     logic feat_accum_en;
     logic [5:0][2:0][20:0] capture_mat;
     logic [5:0][20:0] out_mat;
-
+/*
     always_ff @( posedge clk or negedge rst_n ) begin : debug
         if(~rst_n) begin
             for(logic [2:0] x = 0; x<5; x++) begin
@@ -65,7 +65,7 @@ module gcn (
             out_mat_o     <= out_mat; 
         end
     end
-
+*/
     logic [7:0] i, j;
     logic start_r; 
     logic [num_of_cols_fm-1:0] [num_of_elements_in_col-1:0] [BW-1:0]  col_features_r;
@@ -109,9 +109,6 @@ module gcn (
                         col_features_r <= col_features;
                 end
                 if(feat_accum_en) begin
-                    //for(i=0; i<num_of_rows_wm ; i++) begin 
-                        //row_weights_r[0][i]  <= row_weights[i][wm_addr-:6];
-                        //row_weights_r[1][i]  <= row_weights[i][wm_addr+6'd5-:6];
                         row_weights_r[0][0]  <= row_weights[0][0];
                         row_weights_r[0][1]  <= row_weights[0][1];
                         row_weights_r[0][2]  <= row_weights[0][2];
@@ -119,8 +116,6 @@ module gcn (
                         row_weights_r[1][0]  <= row_weights[1][0];
                         row_weights_r[1][1]  <= row_weights[1][1];
                         row_weights_r[1][2]  <= row_weights[1][2];
-                        //row_weights_r[1][0]  <=
-                    //end
                 end
                 if(output_we == 1'b1) begin
                     y <= pre_y;
@@ -541,10 +536,7 @@ assign next_feat_accum_cnt = (feat_accum_en & ~feat_trans_en & ~out_en)? feat_ac
     assign next_out_cnt = ((out_cnt<3'd3) && out_en && ~out_done)? out_cnt + 1 : 0;
 
     always_comb begin
-        //for (i5 = 3'd0; i5<3'd6; i5++) begin 
-        //    next_out_mat[i5] = '0;
-        //end
-        for (i5 = 3'd0; i5<3'd6; i5++) begin  
+         for (i5 = 3'd0; i5<3'd6; i5++) begin  
             if (out_mat[i5] < capture_mat[i5][out_cnt]) begin 
                 next_out_mat[i5] = capture_mat[i5][out_cnt];
                 next_pre_y [i5]  = out_cnt; 
@@ -555,18 +547,6 @@ assign next_feat_accum_cnt = (feat_accum_en & ~feat_trans_en & ~out_en)? feat_ac
             end
         end
     end
-    /*
-    always_comb begin
-        for (i5 = 3'd0; i5<3'd6; i5++) begin
-            if (next_out_mat[i5] < accum_mat2[i5][out_cnt]) begin
-                next_out_mat[i5] = capture_mat[i5][out_cnt]
-                next_pre_y [i5]  = out_cnt; 
-            end
-            else begin
-                next_out_mat[i5] = out_mat[i5];
-                next_pre_y[i5]   = next_pre_y[i5];
-            end
-        end
-    end*/
+
 
 endmodule

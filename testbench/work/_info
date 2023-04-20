@@ -16,17 +16,17 @@ r1
 !s85 0
 31
 !i10b 1
-!s100 Z_AYhm8`S9^[ZI3be9OAW2
-IC1=45_mAUzcBX[jhl06H33
+!s100 8Na_bUP;;`f@2N5PVoZK;3
+IgWi4dUG5bdlP=0oG5H7g52
 !s105 gcn_sv_unit
 S1
 Z2 dC:/Users/npdho/Desktop/Lab4/testbench
-Z3 w1681957741
+Z3 w1681960866
 Z4 8C:/Users/npdho/Desktop/Lab4/testbench/gcn.sv
 Z5 FC:/Users/npdho/Desktop/Lab4/testbench/gcn.sv
 L0 4
 Z6 OV;L;10.5b;63
-Z7 !s108 1681957758.000000
+Z7 !s108 1681960871.000000
 Z8 !s107 params.vh|C:/Users/npdho/Desktop/Lab4/testbench/gcn.sv|
 Z9 !s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/Users/npdho/Desktop/Lab4/testbench/gcn.sv|
 !i113 1
@@ -106,15 +106,15 @@ R10
 R11
 vgcn_tb
 R0
-!s110 1681957073
+!s110 1681960797
 !i10b 1
-!s100 e=1U[HD<EYk;8:M@:TL@12
-I[GUTVZjCglB[bUTikYH2L3
+!s100 Ua_k_zD54PHa^hiJiQ2?I0
+I58dF>D3mz[FVAW`52nDhB1
 R1
 !s105 gcn_tb_sv_unit
 S1
 R2
-w1681957070
+w1681960795
 8C:/Users/npdho/Desktop/Lab4/testbench/gcn_tb.sv
 FC:/Users/npdho/Desktop/Lab4/testbench/gcn_tb.sv
 F./params.vh
@@ -127,7 +127,7 @@ R6
 r1
 !s85 0
 31
-!s108 1681957073.000000
+!s108 1681960797.000000
 !s107 ./finish_subtask.sv|./clk_gen_reset_subtask.sv|./parametrized_decode_subtask.sv|./tasks_to_read_txt.sv|./params.vh|C:/Users/npdho/Desktop/Lab4/testbench/gcn_tb.sv|
 !s90 -reportprogress|300|-work|work|-sv|-stats=none|C:/Users/npdho/Desktop/Lab4/testbench/gcn_tb.sv|
 !i113 1

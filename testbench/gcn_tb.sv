@@ -60,16 +60,16 @@ gcn DUT (.clk(clk),
          .output_addr(output_addr),
          //.aggregated_out(aggregated_out),
          //.aggregated_address(aggregated_address),
-         .done(done),
+         .done(done)
          //debug stuff
-         .trans_mat1_o(trans_mat1_o),
-         .trans_mat2_o(trans_mat2_o),
-         .accum_mat1_o(accum_mat1_o),
-         .accum_mat2_o(accum_mat2_o),
-         .ag1_o(ag1_o),
-         .ag2_o(ag2_o),
-         .capture_mat_o(capture_mat_o),
-         .out_mat_o(out_mat_o)
+         //.trans_mat1_o(trans_mat1_o),
+         //.trans_mat2_o(trans_mat2_o),
+         //.accum_mat1_o(accum_mat1_o),
+         //.accum_mat2_o(accum_mat2_o),
+         //.ag1_o(ag1_o),
+         //.ag2_o(ag2_o),
+         //.capture_mat_o(capture_mat_o),
+         //.out_mat_o(out_mat_o)
 );
 //-----------------------------------------//
 
