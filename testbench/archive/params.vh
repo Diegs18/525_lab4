@@ -5,7 +5,7 @@ parameter num_of_cols_fm = 1;  // Change to modify the number of cols in feature
 parameter num_of_rows_wm = 1;  // Change to modify the number of cols in weight matrix you can take -- MAX_VALUE = 3
 parameter num_of_rows_fm = 1;  // Change to modify the number of rows in feature matrix you can take -- MAX_VALUE = 6
 parameter num_of_outs = 1;  // Change to modify the number of outputs the design can produce at a time -- MAX_VALUE = 6
-parameter cycles_to_finish = 15; // Change to modify the number of cycles it takes for the design to give the final output
+parameter cycles_to_finish = 67; // Change to modify the number of cycles it takes for the design to give the final output
 //-----------------------------------------//
 
 //---------------Fixed Params--------------// !!!!!!!! NOT MEANT TO BE CHANGED !!!!!!!!!!!!
